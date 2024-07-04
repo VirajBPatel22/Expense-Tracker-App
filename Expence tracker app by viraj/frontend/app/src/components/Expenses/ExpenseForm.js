@@ -1,4 +1,3 @@
-//final soluation  
 import React, { useState } from "react";
 import styled from "styled-components";
 import DatePicker from 'react-datepicker';
@@ -7,10 +6,8 @@ import { useGlobalContext } from "../../context/globalContext";
 import Button from "../Button/Button";
 import { FaPlus } from 'react-icons/fa';
 
-
-
 function ExpenseForm() {
-    const { addExpense} = useGlobalContext();
+    const { addExpense, error } = useGlobalContext();
     const [inputState, setInputState] = useState({
         title: '',
         amount: '',
@@ -53,6 +50,7 @@ function ExpenseForm() {
 
     return (
         <ExpenseFormStyled onSubmit={handleSubmit}>
+            {error && <p className="error">{error}</p>}
             <div className="input-control">
                 <input
                     type="text"
@@ -120,13 +118,12 @@ function ExpenseForm() {
                     color="#fff"
                 />
             </div>
-            
         </ExpenseFormStyled>
     );
 }
 
 const ExpenseFormStyled = styled.form`
- display: flex;
+    display: flex;
     flex-direction: column;
     gap: 2rem;
     input, textarea, select {
@@ -168,7 +165,10 @@ const ExpenseFormStyled = styled.form`
             }
         }
     }
-    
+    .error {
+        color: red;
+        font-size: 0.9rem;
+    }
 `;
 
 export default ExpenseForm;

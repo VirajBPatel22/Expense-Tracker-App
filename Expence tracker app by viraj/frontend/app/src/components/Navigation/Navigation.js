@@ -1,5 +1,3 @@
-//new code  
-
 import React from 'react';
 import styled from 'styled-components';
 import avatar from '../../img/avatar.png';
@@ -7,11 +5,6 @@ import { signout } from '../../utils/icons';
 import { menuItems1 } from '../../utils/menuItems';
 
 const Navigation = ({ active, setActive }) => {
-
-    // const handleClick = (id) => {
-    //     setActive(id);  // Update the active state with the clicked item's id
-    // };
-
     return (
         <NavStyled>
             <div className="user-con">

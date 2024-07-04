@@ -1,78 +1,89 @@
-//old code 
-
 import React, { useContext, useState, useEffect } from "react";
 import axios from 'axios';
-// import Income from "../components/Income/Income";
 
 const BASE_URL = "http://localhost:5000/api/v1/";
 const GlobalContext = React.createContext();
 
 export const GlobalProvider = ({ children }) => {
     const [incomes, setIncomes] = useState([]);
-    const[expenses,setExpenses]=useState([]);
+    const [expenses, setExpenses] = useState([]);
     const [error, setError] = useState(null);
 
     const addIncome = async (income) => {
+        setError(null);
         try {
-            const response = await axios.post(`${BASE_URL}add-income`, income);
-            // Handle the response if needed
-        } catch (err) {
-            setError(err.response.data.message);
-        }
-        getIncomes()
-    };  
-
-    
-    const getIncomes = async () => {
-        try {
-            const response = await axios.get(`${BASE_URL}get-incomes`);
-            setIncomes(response.data);
-            console.log(response.data);
+            await axios.post(`${BASE_URL}add-income`, income);
+            getIncomes();
         } catch (err) {
             setError(err.response.data.message);
         }
     };
+
+    const getIncomes = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}get-incomes`);
+            setIncomes(response.data);
+        } catch (err) {
+            setError(err.response.data.message);
+        }
+    };
+
     const deleteIncome = async (id) => {
-        const res = await axios.delete(`${BASE_URL}delete-income/${id}`)
-        getIncomes()
-    }
-    const totalIncome = ()=>{
-        let totalIncome = 0;
-        incomes.forEach((income)=>{
-            totalIncome =totalIncome + income.amount
-        })
-        return totalIncome;
-    }
-    // console.log(totalIncome());
-    const addExpense = async (income) => {
-        const response = await axios.post(`${BASE_URL}add-expense`, income)
-            .catch((err) =>{
-                setError(err.response.data.message)
-            })
-        getExpenses()
-    }
+        try {
+            await axios.delete(`${BASE_URL}delete-income/${id}`);
+            getIncomes();
+        } catch (err) {
+            setError(err.response.data.message);
+        }
+    };
+
+    const totalIncome = () => {
+        return incomes.reduce((total, income) => total + income.amount, 0);
+    };
+
+    const addExpense = async (expense) => {
+        setError(null);
+        try {
+            await axios.post(`${BASE_URL}add-expense`, expense);
+            getExpenses();
+        } catch (err) {
+            setError(err.response.data.message);
+        }
+    };
 
     const getExpenses = async () => {
-        const response = await axios.get(`${BASE_URL}get-expenses`)
-        setExpenses(response.data)
-        console.log(response.data)
-    }
+        try {
+            const response = await axios.get(`${BASE_URL}get-expenses`);
+            setExpenses(response.data);
+        } catch (err) {
+            setError(err.response.data.message);
+        }
+    };
 
     const deleteExpense = async (id) => {
-        const res  = await axios.delete(`${BASE_URL}delete-expense/${id}`)
-        getExpenses()
-    }
+        try {
+            await axios.delete(`${BASE_URL}delete-expense/${id}`);
+            getExpenses();
+        } catch (err) {
+            setError(err.response.data.message);
+        }
+    };
 
     const totalExpenses = () => {
-        let totalIncome = 0;
-        expenses.forEach((income) =>{
-            totalIncome = totalIncome + income.amount
-        })
+        return expenses.reduce((total, expense) => total + expense.amount, 0);
+    };
 
-        return totalIncome;
-    }
+    const totalBalance = () => {
+        return totalIncome() - totalExpenses();
+    };
+
+    const transactionHistory = () => {
+        const history = [...incomes, ...expenses];
+        history.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        return history.slice(0, 3);
+    };
+
     return (
-        
         <GlobalContext.Provider value={{
             addIncome,
             getIncomes,
@@ -83,7 +94,10 @@ export const GlobalProvider = ({ children }) => {
             getExpenses,
             expenses,
             deleteExpense,
-            totalExpenses
+            totalExpenses,
+            totalBalance,
+            transactionHistory,
+            error
         }}>
             {children}
         </GlobalContext.Provider>
@@ -93,73 +107,3 @@ export const GlobalProvider = ({ children }) => {
 export const useGlobalContext = () => {
     return useContext(GlobalContext);
 };
-
-
-
-// import React, { useContext, useState } from "react";
-// import axios from 'axios';
-
-// const BASE_URL = "http://localhost:5000/api/v1/";
-
-// const GlobalContext = React.createContext();
-
-// export const GlobalProvider = ({ children }) => {
-//     const [incomes, setIncomes] = useState([]);
-//     const [expenses, setExpenses] = useState([]);
-//     const [error, setError] = useState(null);
-    
-//     const addIncome = async (income) => {
-//         try {
-//             const response = await axios.post(`${BASE_URL}add-income`, income);
-//             // Handle the response if needed
-//         } catch (err) {
-//             setError(err.response.data.message);
-//         }
-//     };   
-
-//     return (
-//         <GlobalContext.Provider value={{
-//             addIncome
-//         }}>
-//             {children}
-//         </GlobalContext.Provider>
-//     )
-// }
-
-// export const useGlobalContext = () => {
-//     return useContext(GlobalContext);
-// };
-
-
-
-// import React, { Children, useContext, useState,useEffect } from "react";
-// import axios from 'axios';
-
-// const BASE_URL = "http://localhost:5000/api/v1/";
-
-// const GlobalContext=React.createContext()
-
-// export const GlobalProvider = ({Children})=>{
-//     const [incomes, setIncomes] = useState([]);
-//     const [expenses, setExpenses] = useState([]);
-//     const [error, setError] = useState(null);
-    
-//     const addIncome = async (income) => {
-//         try {
-//             const response = await axios.post(`${BASE_URL}add-income`, income);
-//             // Handle the response if needed
-//         } catch (err) {
-//             setError(err.response.data.message);
-//         }
-//     };   
-
-//     return (
-//         <GlobalContext.Provider value={'hello'}>
-//             {Children}
-//         </GlobalContext.Provider>
-//     )
-// }
-
-// export const useGlobalContext = () => {
-//     return useContext(GlobalContext);
-// };

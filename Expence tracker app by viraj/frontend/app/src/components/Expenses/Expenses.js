@@ -1,15 +1,7 @@
-//old code   
-
-// code by chatGPT
-
-
-
 import React, { useEffect } from 'react';
-// import React from 'react';
 import styled from 'styled-components';
 import { InnerLayout } from '../../styles/Layouts';
 import { useGlobalContext } from '../../context/globalContext';
-// import Form from '../Form/Form';
 import IncomeItem from '../IncomeItem/IncomeItem';
 import ExpenseForm from './ExpenseForm';
 
@@ -87,25 +79,3 @@ const ExpenseStyled = styled.div`
 `;
 
 export default Expenses;
-
-
-
-// import React from 'react';
-// import styled from 'styled-components';
-// import { InnerLayout } from '../../styles/Layouts';
-
-// function Expenses() {
-//     return (
-//         <ExpenseStyled>
-//             <InnerLayout>
-//             Expenses
-//             </InnerLayout>
-//         </ExpenseStyled>
-//     );
-// }
-
-// const ExpenseStyled = styled.div`
-//     /* Add your styling here */
-// `;
-
-// export default Expenses;
