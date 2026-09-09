@@ -2,6 +2,9 @@
 
 A full-featured, modern financial management dashboard and expense tracker built with the **MERN Stack** (MongoDB, Express.js, React, Node.js), **Chart.js**, **Styled-Components**, and **JWT Authentication**.
 
+🚀 **Live Frontend Demo**: [https://expense-tracker-app-rust-eta.vercel.app](https://expense-tracker-app-rust-eta.vercel.app)  
+⚙️ **Live Backend API**: [https://expense-tracker-app-rd9z.onrender.com](https://expense-tracker-app-rd9z.onrender.com)
+
 ---
 
 ## 🌟 Key Features
