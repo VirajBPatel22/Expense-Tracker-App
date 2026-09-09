@@ -19,12 +19,17 @@ const ExpenseSchema = new mongoose.Schema({
     },
     tdis: {
         type: String,
-        required: true
+        trim: true,
+        default: ''
     },
     date: {
         type: Date,
         required: true,
         trim: true
+    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 }, { timestamps: true });
 

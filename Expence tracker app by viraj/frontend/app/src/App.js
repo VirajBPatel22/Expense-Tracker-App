@@ -7,24 +7,25 @@ import Navigation from './components/Navigation/Navigation';
 import Dashboard from './components/Dashboard/Dashboard';
 import Income from './components/Income/Income';
 import Expenses from './components/Expenses/Expenses';
+import ViewTransactions from './components/ViewTransactions/ViewTransactions';
+import Auth from './components/Auth/Auth';
 import { useGlobalContext } from './context/globalContext';
 
 function App() {
-    const [active, setActive] = useState(1); // Initialize active state with null or initial value
-    const global = useGlobalContext();
-    console.log(global);
+    const [active, setActive] = useState(1);
+    const { isAuthenticated } = useGlobalContext();
 
     const displayData = () => {
-        switch(active) {
+        switch (active) {
             case 1:
                 return <Dashboard />;
             case 2:
-                return <Dashboard />;
+                return <ViewTransactions />;
             case 3:
                 return <Income />;
-            case 4: 
+            case 4:
                 return <Expenses />;
-            default: 
+            default:
                 return <Dashboard />;
         }
     };
@@ -36,12 +37,16 @@ function App() {
     return (
         <AppStyled bg={bg} className="App">
             {orbMemo}
-            <MainLayout>
-                <Navigation active={active} setActive={setActive} /> {/* Pass active state and setActive function */}
-                <main>
-                    {displayData()}
-                </main>
-            </MainLayout>
+            {!isAuthenticated ? (
+                <Auth />
+            ) : (
+                <MainLayout>
+                    <Navigation active={active} setActive={setActive} />
+                    <main>
+                        {displayData()}
+                    </main>
+                </MainLayout>
+            )}
         </AppStyled>
     );
 }

@@ -1,51 +1,200 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    Filler
+} from 'chart.js';
+import { Line, Doughnut } from 'react-chartjs-2';
 import { useGlobalContext } from '../../context/globalContext';
 import { dateFormat } from '../../utils/dateFormat';
 
-function Chart() {
-    const { incomes, expenses, error } = useGlobalContext();
-    const [sortedIncomes, setSortedIncomes] = useState([]);
-    const [sortedExpenses, setSortedExpenses] = useState([]);
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    Filler
+);
 
-    useEffect(() => {
-        if (!error) {
-            setSortedIncomes([...incomes]);
-            setSortedExpenses([...expenses]);
+function Chart({ incomesData, expensesData }) {
+    const context = useGlobalContext();
+    const incomes = incomesData || context.incomes;
+    const expenses = expensesData || context.expenses;
+    const [chartMode, setChartMode] = useState('line'); // 'line' or 'doughnut'
+
+    // Build chronological date map
+    const sortedTransactions = [...incomes, ...expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
+    const labels = Array.from(new Set(sortedTransactions.map(item => dateFormat(item.date))));
+
+    // Line Chart Data
+    const lineData = {
+        labels: labels.length ? labels : ['No Data'],
+        datasets: [
+            {
+                label: 'Income',
+                data: labels.map(dateLabel => {
+                    const matched = incomes.filter(i => dateFormat(i.date) === dateLabel);
+                    return matched.reduce((sum, item) => sum + item.amount, 0);
+                }),
+                backgroundColor: 'rgba(66, 173, 98, 0.2)',
+                borderColor: '#42AD62',
+                pointBackgroundColor: '#42AD62',
+                pointBorderColor: '#fff',
+                pointHoverRadius: 6,
+                tension: 0.35,
+                fill: true
+            },
+            {
+                label: 'Expenses',
+                data: labels.map(dateLabel => {
+                    const matched = expenses.filter(e => dateFormat(e.date) === dateLabel);
+                    return matched.reduce((sum, item) => sum + item.amount, 0);
+                }),
+                backgroundColor: 'rgba(255, 0, 0, 0.15)',
+                borderColor: '#FF0000',
+                pointBackgroundColor: '#FF0000',
+                pointBorderColor: '#fff',
+                pointHoverRadius: 6,
+                tension: 0.35,
+                fill: true
+            }
+        ]
+    };
+
+    const lineOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    font: { family: 'inherit', size: 13, weight: 'bold' },
+                    color: '#222260',
+                    usePointStyle: true,
+                    boxWidth: 8
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(34, 34, 96, 0.9)',
+                padding: 12,
+                titleFont: { size: 14 },
+                bodyFont: { size: 13 },
+                callbacks: {
+                    label: (context) => ` ${context.dataset.label}: ₹${context.raw.toLocaleString('en-IN')}`
+                }
+            }
+        },
+        scales: {
+            y: {
+                ticks: {
+                    callback: (value) => '₹' + value.toLocaleString('en-IN'),
+                    color: 'rgba(34, 34, 96, 0.6)'
+                },
+                grid: { color: 'rgba(0, 0, 0, 0.05)' }
+            },
+            x: {
+                ticks: { color: 'rgba(34, 34, 96, 0.6)' },
+                grid: { display: false }
+            }
         }
-    }, [incomes, expenses, error]);
+    };
+
+    // Doughnut Data (Expense breakdown)
+    const expenseCategories = {};
+    expenses.forEach(e => {
+        const cat = e.category || 'other';
+        expenseCategories[cat] = (expenseCategories[cat] || 0) + e.amount;
+    });
+
+    const categoryLabels = Object.keys(expenseCategories).map(
+        c => c.charAt(0).toUpperCase() + c.slice(1)
+    );
+    const categoryValues = Object.values(expenseCategories);
+
+    const doughnutColors = [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+        '#9966FF', '#FF9F40', '#42AD62', '#E7E9ED'
+    ];
+
+    const doughnutData = {
+        labels: categoryLabels.length ? categoryLabels : ['No Expenses'],
+        datasets: [
+            {
+                data: categoryValues.length ? categoryValues : [1],
+                backgroundColor: categoryValues.length ? doughnutColors.slice(0, categoryValues.length) : ['#e0e0e0'],
+                borderColor: '#ffffff',
+                borderWidth: 3
+            }
+        ]
+    };
+
+    const doughnutOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
+                    font: { family: 'inherit', size: 12, weight: '600' },
+                    color: '#222260',
+                    usePointStyle: true
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: (context) => {
+                        if (!categoryValues.length) return ' No expense data';
+                        return ` ${context.label}: ₹${context.raw.toLocaleString('en-IN')}`;
+                    }
+                }
+            }
+        }
+    };
+
+    const hasData = incomes.length > 0 || expenses.length > 0;
 
     return (
         <ChartStyled>
-            {error && <p className="error">Error loading data: {error}</p>}
-            <div className="column">
-                <h2>Incomes</h2>
-                {sortedIncomes.length > 0 ? (
-                    <ul>
-                        {sortedIncomes.map((income, index) => (
-                            <li key={index}>
-                                <span className="date"><b>{dateFormat(income.date)}</b></span>
-                                <span className="amount">₹{income.amount}</span>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No incomes available.</p>
-                )}
+            <div className="chart-header">
+                <h3>Financial Overview</h3>
+                <div className="toggle-btns">
+                    <button
+                        className={chartMode === 'line' ? 'active' : ''}
+                        onClick={() => setChartMode('line')}
+                    >
+                        Trend
+                    </button>
+                    <button
+                        className={chartMode === 'doughnut' ? 'active' : ''}
+                        onClick={() => setChartMode('doughnut')}
+                    >
+                        Expenses by Category
+                    </button>
+                </div>
             </div>
-            <div className="column">
-                <h2>Expenses</h2>
-                {sortedExpenses.length > 0 ? (
-                    <ul>
-                        {sortedExpenses.map((expense, index) => (
-                            <li key={index}>
-                                <span className="date"><b>{dateFormat(expense.date)}</b></span>
-                                <span className="amount">₹{expense.amount}</span>
-                            </li>
-                        ))}
-                    </ul>
+
+            <div className="chart-body">
+                {!hasData ? (
+                    <div className="empty-chart">
+                        <p>No transaction data available to plot chart.</p>
+                        <span>Add an income or expense to see interactive analytics!</span>
+                    </div>
+                ) : chartMode === 'line' ? (
+                    <Line data={lineData} options={lineOptions} />
                 ) : (
-                    <p>No expenses available.</p>
+                    <Doughnut data={doughnutData} options={doughnutOptions} />
                 )}
             </div>
         </ChartStyled>
@@ -56,88 +205,77 @@ const ChartStyled = styled.div`
     background: #FCF6F9;
     border: 2px solid #FFFFFF;
     box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
-    padding: 2rem;
+    padding: 1.5rem;
     border-radius: 20px;
     height: 100%;
     display: flex;
-    justify-content: space-between;
-    gap: 2rem;
+    flex-direction: column;
+    gap: 1rem;
 
-    .column {
-        flex: 1;
-        border-radius: 10px;
-        padding: 1rem;
-        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    .chart-header {
         display: flex;
-        flex-direction: column;
-        overflow: hidden;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
 
-        h2 {
-            text-align: center;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-            color: var(--color-accent);
+        h3 {
+            font-size: 1.25rem;
+            color: #222260;
         }
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-            overflow-y: auto;
-            max-height: 400px;
-            &::-webkit-scrollbar {
-                display: none;
-            }
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        li {
+        .toggle-btns {
             display: flex;
-            justify-content: space-between;
+            background: #fff;
+            border-radius: 12px;
+            padding: 3px;
+            border: 1px solid #eee;
+
+            button {
+                border: none;
+                background: transparent;
+                padding: 0.4rem 0.9rem;
+                font-family: inherit;
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: rgba(34, 34, 96, 0.6);
+                border-radius: 9px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &.active {
+                    background: #222260;
+                    color: #fff;
+                }
+
+                &:hover:not(.active) {
+                    color: #222260;
+                }
+            }
+        }
+    }
+
+    .chart-body {
+        flex: 1;
+        min-height: 280px;
+        position: relative;
+
+        .empty-chart {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 0.5rem 1rem;
-            margin-bottom: 0.5rem;
-            background: #f9f9f9;
-            border-radius: 5px;
-            transition: background 0.3s ease;
-
-            &:hover {
-                background: #f1f1f1;
-            }
-
-            .date {
-                color: var(--primary-color);
-                font-size: 0.9rem;
-            }
-
-            .amount {
-                font-weight: bold;
-                color: var(--color-green);
-            }
-        }
-
-        p {
+            color: rgba(34, 34, 96, 0.6);
+            gap: 0.5rem;
             text-align: center;
-            color: var(--primary-color3);
+            padding: 2rem;
+
+            span {
+                font-size: 0.85rem;
+                color: rgba(34, 34, 96, 0.4);
+            }
         }
-    }
-
-    .error {
-        color: var(--color-delete);
-        font-size: 1.2rem;
-        text-align: center;
-        margin-top: 1rem;
-        animation: shake 0.5s ease-in-out;
-    }
-
-    @keyframes shake {
-        0% { transform: translateX(0); }
-        25% { transform: translateX(10px); }
-        50% { transform: translateX(-10px); }
-        75% { transform: translateX(10px); }
-        100% { transform: translateX(0); }
     }
 `;
 

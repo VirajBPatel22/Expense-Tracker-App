@@ -3,22 +3,25 @@ import styled from 'styled-components';
 import avatar from '../../img/avatar.png';
 import { signout } from '../../utils/icons';
 import { menuItems1 } from '../../utils/menuItems';
+import { useGlobalContext } from '../../context/globalContext';
 
 const Navigation = ({ active, setActive }) => {
+    const { user, logout } = useGlobalContext();
+
     return (
         <NavStyled>
             <div className="user-con">
                 <img src={avatar} alt="Avatar" />
                 <div className="text">
-                    <h2>Viraj</h2>
-                    <p>Your Money</p>
+                    <h2>{user?.name || 'Viraj'}</h2>
+                    <p>{user?.email || 'Your Money'}</p>
                 </div>
             </div>
             <ul className="menu-items">
                 {menuItems1.map((item) => (
                     <li
                         key={item.id}
-                        onClick={() => setActive(item.id)} // Call handleClick with item.id
+                        onClick={() => setActive(item.id)}
                         className={active === item.id ? 'active' : ''}
                     >
                         {item.icon}
@@ -27,7 +30,9 @@ const Navigation = ({ active, setActive }) => {
                 ))}
             </ul>
             <div className="bottom-nav">
-                <li>{signout} Sign Out</li>
+                <li onClick={logout}>
+                    {signout} Sign Out
+                </li>
             </div>
         </NavStyled>
     );

@@ -1,47 +1,73 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { InnerLayout } from '../../styles/Layouts';
 import { useGlobalContext } from '../../context/globalContext';
 import Form from '../Form/Form';
 import IncomeItem from '../IncomeItem/IncomeItem';
+import EditModal from '../EditModal/EditModal';
 
 function Income() {
-    const { addIncome,incomes,getIncomes,deleteIncome,totalIncome} = useGlobalContext();
+    const { incomes, getIncomes, deleteIncome, updateIncome, totalIncome } = useGlobalContext();
+    const [editingItem, setEditingItem] = useState(null);
+    const [isEditOpen, setIsEditOpen] = useState(false);
 
     useEffect(() => {
         getIncomes();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const handleEditClick = (item) => {
+        setEditingItem(item);
+        setIsEditOpen(true);
+    };
+
+    const handleCloseEdit = () => {
+        setEditingItem(null);
+        setIsEditOpen(false);
+    };
 
     return (
         <IncomeStyled>
             <InnerLayout>
                 <h1>Incomes</h1>
-                <h2 className='total-income'>Total Income: <span>₹{totalIncome()}</span></h2>
+                <h2 className='total-income'>Total Income: <span>₹{totalIncome().toLocaleString('en-IN')}</span></h2>
                 <div className="income-content">
                     <div className="form-container">
-                        <Form></Form>
+                        <Form />
                     </div>
                     <div className="incomes">
-                    {incomes.map((income) => {
-                            const { _id, title, amount, date, category, tdis, type } = income;
-                            console.log(income)
-                            return (
-                                <IncomeItem
-                                    key={_id}
-                                    id={_id}
-                                    title={title}
-                                    description={tdis}
-                                    amount={amount}
-                                    category={category}
-                                    date={date}
-                                    type={type}
-                                    indicatorColor="var(--color-green)"
-                                    deleteItem={deleteIncome} // Implement deleteItem function if necessary
-                                />
-                            );
-                        })}
+                        {incomes.length === 0 ? (
+                            <p className="no-data">No incomes added yet. Start by adding one!</p>
+                        ) : (
+                            incomes.map((income) => {
+                                const { _id, title, amount, date, category, tdis, type } = income;
+                                return (
+                                    <IncomeItem
+                                        key={_id}
+                                        id={_id}
+                                        title={title}
+                                        description={tdis}
+                                        amount={amount}
+                                        category={category}
+                                        date={date}
+                                        type={type}
+                                        indicatorColor="var(--color-green)"
+                                        deleteItem={deleteIncome}
+                                        onEdit={() => handleEditClick(income)}
+                                    />
+                                );
+                            })
+                        )}
                     </div>
                 </div>
+
+                <EditModal
+                    isOpen={isEditOpen}
+                    onClose={handleCloseEdit}
+                    item={editingItem}
+                    type="income"
+                    onSave={updateIncome}
+                />
             </InnerLayout>
         </IncomeStyled>
     );

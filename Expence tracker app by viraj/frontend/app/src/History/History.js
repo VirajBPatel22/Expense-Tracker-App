@@ -10,26 +10,30 @@ function History() {
     return (
         <HistoryStyled>
             <h2>Recent History</h2>
-            {history.map((item) =>{
-                const {_id, title, amount, type} = item
-                return (
-                    <div key={_id} className="history-item">
-                        <p style={{
-                            color: type === 'expense' ? 'red' : 'var(--color-green)'
-                        }}>
-                            {title}
-                        </p>
+            {history.length === 0 ? (
+                <p className="empty-text">No recent transactions yet.</p>
+            ) : (
+                history.map((item) => {
+                    const { _id, title, amount, type } = item;
+                    return (
+                        <div key={_id} className="history-item">
+                            <p style={{
+                                color: type === 'expense' ? 'var(--color-delete)' : 'var(--color-green)',
+                                fontWeight: 600
+                            }}>
+                                {title}
+                            </p>
 
-                        <p style={{
-                            color: type === 'expense' ? 'red' : 'var(--color-green)'
-                        }}>
-                            {
-                                type === 'expense' ? `-${amount <= 0 ? 0 : amount}` : `+${amount <= 0 ? 0: amount}`
-                            }
-                        </p>
-                    </div>
-                )
-            })}
+                            <p style={{
+                                color: type === 'expense' ? 'var(--color-delete)' : 'var(--color-green)',
+                                fontWeight: 700
+                            }}>
+                                {type === 'expense' ? `-₹${(amount <= 0 ? 0 : amount).toLocaleString('en-IN')}` : `+₹${(amount <= 0 ? 0 : amount).toLocaleString('en-IN')}`}
+                            </p>
+                        </div>
+                    );
+                })
+            )}
         </HistoryStyled>
     )
 }
@@ -47,6 +51,12 @@ const HistoryStyled = styled.div`
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    .empty-text {
+        font-size: 0.9rem;
+        color: rgba(34, 34, 96, 0.5);
+        text-align: center;
+        padding: 0.5rem;
     }
 `;
 

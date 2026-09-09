@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { bitcoin, rupee,book, calender, card, circle, clothing, comment, food, freelance, medical, money, piggy, stocks, takeaway, trash, tv, users, yt } from '../../utils/icons';
+import { bitcoin, rupee, book, calender, card, circle, clothing, comment, food, freelance, medical, money, piggy, stocks, takeaway, trash, tv, users, yt } from '../../utils/icons';
 import Button from '../Button/Button';
 import { dateFormat } from '../../utils/dateFormat';
+import { FaEdit } from 'react-icons/fa';
 
 function IncomeItem({
     id,
@@ -12,15 +13,16 @@ function IncomeItem({
     category,
     description,
     deleteItem,
+    onEdit,
     indicatorColor,
     type
 }) {
-    const categoryIcon = () =>{
-        switch(category) {
+    const categoryIcon = () => {
+        switch (category) {
             case 'salary':
                 return money;
             case 'freelancing':
-                return freelance
+                return freelance;
             case 'investments':
                 return stocks;
             case 'stocks':
@@ -34,9 +36,10 @@ function IncomeItem({
             case 'other':
                 return piggy;
             default:
-                return ''
+                return piggy;
         }
-    }
+    };
+
     const expenseCatIcon = () => {
         switch (category) {
             case 'education':
@@ -56,10 +59,9 @@ function IncomeItem({
             case 'other':
                 return circle;
             default:
-                return ''
+                return circle;
         }
-    }
-    console.log('type',type)
+    };
 
     return (
         <IncomeItemStyled indicator={indicatorColor}>
@@ -70,22 +72,36 @@ function IncomeItem({
                 <h5>{title}</h5>
                 <div className="inner-content">
                     <div className="text">
-                        <p>{rupee} {amount}</p>
+                        <p>{rupee} {amount.toLocaleString('en-IN')}</p>
                         <p>{calender} {dateFormat(date)}</p>
-                        <p>
-                            {comment}
-                            {description}
-                        </p>
+                        {description && (
+                            <p>
+                                {comment}
+                                {description}
+                            </p>
+                        )}
                     </div>
                     <div className="btn-con">
-                        <Button 
+                        {onEdit && (
+                            <Button
+                                icon={<FaEdit />}
+                                bPad={'0.8rem'}
+                                bRad={'50%'}
+                                bg={'var(--color-accent)'}
+                                color={'#fff'}
+                                iColor={'#fff'}
+                                hColor={'var(--color-green)'}
+                                onClick={onEdit}
+                            />
+                        )}
+                        <Button
                             icon={trash}
-                            bPad={'1rem'}
+                            bPad={'0.8rem'}
                             bRad={'50%'}
                             bg={'var(--primary-color)'}
                             color={'#fff'}
                             iColor={'#fff'}
-                            hColor={'var(--color-green)'}
+                            hColor={'var(--color-delete)'}
                             onClick={() => deleteItem(id)}
                         />
                     </div>
@@ -156,6 +172,11 @@ const IncomeItemStyled = styled.div`
                     color: var(--primary-color);
                     opacity: 0.8;
                 }
+            }
+            .btn-con {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
             }
         }
     }

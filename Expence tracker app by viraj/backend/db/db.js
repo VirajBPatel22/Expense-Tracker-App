@@ -1,11 +1,17 @@
 const mongoose = require('mongoose');
-const db = async() =>{
+
+const db = async () => {
     try {
-        mongoose.set('strictQuery',false)
-        await mongoose.connect(process.env.MONGO_URL)
-        console.log('Db connected')
+        mongoose.set('strictQuery', false);
+        if (!process.env.MONGO_URL) {
+            console.warn('⚠️  MONGO_URL is not defined in .env file!');
+            return;
+        }
+        await mongoose.connect(process.env.MONGO_URL);
+        console.log('✅ Db connected successfully');
     } catch (error) {
-        console.log('DB Connection Error');
+        console.error('❌ DB Connection Error:', error.message);
     }
-}
-module.exports = {db}
+};
+
+module.exports = { db };

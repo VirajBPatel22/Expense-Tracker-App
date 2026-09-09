@@ -101,7 +101,7 @@ function ExpenseForm() {
                 <textarea
                     name="tdis"
                     value={tdis}
-                    placeholder="Add A reference"
+                    placeholder="Add a reference / comment (optional)"
                     id="tdis"
                     cols="30"
                     rows="4"
