@@ -119,5 +119,13 @@ npm start
 
 ---
 
+## 👤 Author
+
+**Viraj Patel**
+- GitHub: [@VirajBPatel22](https://github.com/VirajBPatel22)
+- Repository: [Expense-Tracker-App](https://github.com/VirajBPatel22/Expense-Tracker-App)
+
+---
+
 ## 📄 License
 This project is open source and available under the ISC License.

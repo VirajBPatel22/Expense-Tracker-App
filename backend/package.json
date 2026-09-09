@@ -1,14 +1,14 @@
 {
-  "name": "backend",
+  "name": "expense-tracker-backend",
   "version": "1.0.0",
+  "description": "REST API for Expense Tracker Pro with JWT Authentication and MongoDB Atlas",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
-  "author": "",
+  "author": "Viraj Patel <virajpatel2204@gmail.com>",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",

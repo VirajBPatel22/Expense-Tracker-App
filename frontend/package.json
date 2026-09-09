@@ -1,6 +1,8 @@
 {
-  "name": "app",
-  "version": "0.1.0",
+  "name": "expense-tracker-frontend",
+  "version": "1.0.0",
+  "description": "Interactive React dashboard for Expense Tracker Pro",
+  "author": "Viraj Patel <virajpatel2204@gmail.com>",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
